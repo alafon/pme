@@ -1,0 +1,1 @@
+Copyright (c) Arnaud Lafon, http://www.arnaudlafon.com
