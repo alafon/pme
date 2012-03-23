@@ -1,26 +1,23 @@
 {default enable_help=true() enable_link=true() canonical_link=true()}
-
+{def $site_title = ''}
 {if is_set($module_result.content_info.persistent_variable.site_title)}
-    {set scope=root site_title=$module_result.content_info.persistent_variable.site_title}
+    {set $site_title = $module_result.content_info.persistent_variable.site_title}
 {else}
-{let name=Path
-     path=$module_result.path
-     reverse_path=array()}
-  {if is_set($pagedata.path_array)}
-    {set path=$pagedata.path_array}
-  {elseif is_set($module_result.title_path)}
-    {set path=$module_result.title_path}
-  {/if}
-  {section loop=$:path}
-    {set reverse_path=$:reverse_path|array_prepend($:item)}
-  {/section}
+    {set $site_title = ''}
 
-{set-block scope=root variable=site_title}
-{section loop=$Path:reverse_path}{$:item.text|wash}{delimiter} / {/delimiter}{/section} - {$site.title|wash}
-{/set-block}
+    {def $site_title_array = array()
+         $path = cond( is_set($pagedata.path_array), $pagedata.path_array,
+                       is_set($pagedata.title_path), $pagedata.title_path )}
 
-{/let}
+    {foreach $path as $path_item reverse}
+        {if and( is_set( $path_item.node_id ), $path_item.node_id|eq( $pagedata.root_node ) )}{skip}{/if}
+        {set $site_title_array = $site_title_array|append( $path_item.text|wash  )}
+    {/foreach}
+
+    {set $site_title = concat( $site_title_array|implode( ' / '), ' - ', $site.title|wash  )}
+    {undef $path $site_title_array}
 {/if}
+
     <title>{$site_title}</title>
 
     {if and(is_set($#Header:extra_data),is_array($#Header:extra_data))}
@@ -63,4 +60,5 @@
     {include uri="design:link.tpl" enable_help=$enable_help enable_link=$enable_link}
 {/if}
 
+{undef $site_title}
 {/default}
