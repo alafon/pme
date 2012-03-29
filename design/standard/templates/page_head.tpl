@@ -10,7 +10,7 @@
                        is_set($pagedata.title_path), $pagedata.title_path )}
 
     {foreach $path as $path_item reverse}
-        {if and( is_set( $path_item.node_id ), $path_item.node_id|eq( $pagedata.root_node ) )}{skip}{/if}
+        {if and( is_set( $path_item.node_id ), $path_item.node_id|eq( $pagedata.root_node ), $path_item.node_id|ne($current_node_id) )}{break}{/if}
         {set $site_title_array = $site_title_array|append( $path_item.text|wash  )}
     {/foreach}
 
