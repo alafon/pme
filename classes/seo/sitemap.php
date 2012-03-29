@@ -7,6 +7,7 @@ class Sitemap
     private $rootNode;
     private $classFilterType;
     private $classFilterArray;
+    private $excludedNodes;
 
     private $dom;
 
@@ -17,12 +18,19 @@ class Sitemap
         $this->rootNode = $ini->variable( $blockName, 'RootNode' );
         $this->classFilterType = trim( $ini->variable( $blockName, 'ClassFilterType' ) );
         $this->classFilterArray = $ini->variable( $blockName, 'ClassFilterArray' );
+        $this->setExcludedNodes( $ini->variable( $blockName, 'ExcludedNodes' ) );
 
         $this->dom = new \DOMDocument( '1.0', 'UTF-8' );
 
         $root = $this->dom->createElement( 'urlset' );
         $root->setAttribute( "xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9" );
         $root = $this->dom->appendChild( $root );
+    }
+
+    private function setExcludedNodes( $arrayOfStrings )
+    {
+        foreach( $arrayOfStrings as $nodeIDString )
+            $this->excludedNodes[] = intval( $nodeIDString );
     }
 
     public function generate()
@@ -34,10 +42,14 @@ class Sitemap
             $params['ClassFilterArray'] = $this->classFilterArray;
         }
         $nodes = \eZContentObjectTreeNode::subTreeByNodeID( $params, $this->rootNode );
+
         foreach( $nodes as $node )
         {
-            $sitemapURL = new SitemapURL( $node );
-            $this->addURL( $sitemapURL );
+            if( array_search( $node->attribute( 'node_id' ), $this->excludedNodes ) === false )
+            {
+                $sitemapURL = new SitemapURL( $node );
+                $this->addURL( $sitemapURL );
+            }
         }
         return $this->dom->saveXML();
     }
