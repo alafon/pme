@@ -14,7 +14,7 @@
         {set $site_title_array = $site_title_array|append( $path_item.text|wash  )}
     {/foreach}
 
-    {set $site_title = concat( $site_title_array|implode( ' / '), ' - ', $site.title|wash  )}
+    {set $site_title = concat( $site_title_array|implode( ' < '), ' | ', $site.title|wash  )}
     {undef $path $site_title_array}
 {/if}
 
