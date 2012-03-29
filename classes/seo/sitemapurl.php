@@ -41,9 +41,7 @@ class SitemapURL
      */
     private function setLoc( $urlAlias )
     {
-        //URLs encoded as described in RFC 3986 and as requested by the sitemap
-        // protocol format (see http://www.sitemaps.org/protocol.html#escaping)
-        $this->loc = rawurlencode( "http://" . self::getSiteURL() . "/" . $urlAlias );
+        $this->loc = "http://" . self::getSiteURL() . "/" . $urlAlias;
     }
 
     /**
