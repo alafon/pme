@@ -24,6 +24,7 @@ class Sitemap
 
         $root = $this->dom->createElement( 'urlset' );
         $root->setAttribute( "xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9" );
+        $root->setAttribute( "generated", time() );
         $root = $this->dom->appendChild( $root );
     }
 
@@ -91,5 +92,12 @@ class Sitemap
 
         $lastmod = $this->dom->createElement( 'lastmod', $siteMapURL->lastmod );
         $url->appendChild( $lastmod );
+    }
+
+    private function expire()
+    {
+        // does not work for the moment
+        \eZCache::clearByID( 'pme-seo' );
+        \eZCache::clearByTag( 'seo' );
     }
 }

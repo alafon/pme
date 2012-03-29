@@ -4,7 +4,7 @@ $ini = eZINI::instance();
 
 // filepath
 $currentSiteaccess = eZSiteAccess::current();
-$cacheFilePath = eZSys::cacheDirectory() . '/public/sitemap_' . $currentSiteaccess['name'] . '.xml';
+$cacheFilePath = eZSys::cacheDirectory() . '/sitemap/sitemap_' . $currentSiteaccess['name'] . '.xml';
 
 // cache configuration
 $seoIni = eZINI::instance( 'pme_seo.ini' );
@@ -37,8 +37,6 @@ else
         $xml = $cacheFile->fetchContents();
     }
 }
-
-$xml = $sitemapGenerator->generate();
 
 header( 'Content-Type: application/xml;' );
 
