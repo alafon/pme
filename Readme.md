@@ -4,3 +4,7 @@
 
 * Support Google Analytics
 * Support Google Analytics : cross domain tracking
+
+## SEO features
+
+* Sitemap generation (clustered)
