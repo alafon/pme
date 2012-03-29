@@ -15,7 +15,7 @@ class Sitemap
     {
         $ini = \eZINI::instance( 'pme_seo.ini' );
         $blockName = 'SearchEngineOptimisationSettings';
-        $this->rootNode = $ini->variable( $blockName, 'RootNode' );
+        $this->setRootNode( trim( $ini->variable( $blockName, 'RootNode' ) ) );
         $this->classFilterType = trim( $ini->variable( $blockName, 'ClassFilterType' ) );
         $this->classFilterArray = $ini->variable( $blockName, 'ClassFilterArray' );
         $this->setExcludedNodes( $ini->variable( $blockName, 'ExcludedNodes' ) );
@@ -27,6 +27,26 @@ class Sitemap
         $root = $this->dom->appendChild( $root );
     }
 
+    private function setRootNode( $string )
+    {
+        // calculates root_node the same way eZPagedata does
+        if( $string === 'root_node' )
+        {
+            $rootNode = (int) \eZINI::instance('content.ini')->variable( 'NodeSettings', 'RootNode' );
+            $ini= \eZINI::instance();
+            if( $ini->hasVariable( 'SiteSettings', 'RootNodeDepth' ) &&
+                     $ini->variable( 'SiteSettings', 'RootNodeDepth' ) !== '0' )
+            {
+                $rootNode = $ini->variable( 'SiteSettings', 'RootNodeDepth' ) -1;
+            }
+            $this->rootNode = $rootNode;
+        }
+        else
+        {
+            $this->rootNode = $string;
+        }
+    }
+
     private function setExcludedNodes( $arrayOfStrings )
     {
         foreach( $arrayOfStrings as $nodeIDString )
@@ -35,6 +55,13 @@ class Sitemap
 
     public function generate()
     {
+        // first element to add = the root node (because it's not in the results we use
+        // just after
+        $this->addURL(
+            new SitemapURL(
+                \eZContentObjectTreeNode::fetch( $this->rootNode ) ) );
+
+        // the other elements to add = children of the root_node (with some limitations)
         $params = array( 'MainNodeOnly' => true );
         if( strlen($this->classFilterType) )
         {
